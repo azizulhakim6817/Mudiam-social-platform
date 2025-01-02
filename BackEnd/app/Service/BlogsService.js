@@ -27,7 +27,7 @@ export const blogcreateService = async (req, res) => {
 export const blogReadService = async (req, res) => {
   try {
     const blog = await BlogModel.find({});
-
+    
     return { status: "success", data: blog };
   } catch (e) {
     return { status: "error", error: e.toString() };
@@ -192,6 +192,21 @@ export const deleteCommentService = async (req, res) => {
   }
 };
 
+//details Comment Service
+export const detailsCommentService = async (req, res) => {
+  try {
+    const commentID = new ObjectId(req.params.commentID);
+
+    const singleComment = await CommentModel.findById(commentID);
+    if (!singleComment) {
+      return { status: "failed", error: "Comment not found" };
+    }
+    return { status: "success", data: singleComment };
+  } catch (error) {
+    return { status: "success", error: error.toString() };
+  }
+};
+
 //! likes Dislikes .....................................
 //Like ...........
 export const likeService = async (req, res) => {
@@ -207,7 +222,6 @@ export const likeService = async (req, res) => {
       likeDislike.likes = likeDislike.likes.filter(
         (id) => id.toString() !== userID.toString()
       );
-      
     } else if (likeDislike.dislikes.includes(userID)) {
       likeDislike.dislikes = likeDislike.dislikes.filter(
         (id) => id.toString() !== userID.toString()
@@ -247,12 +261,11 @@ export const dislikeService = async (req, res) => {
       );
       likeDislike.dislikes.push(userID.toString());
     } else if (likeDislike.dislikes.includes(userID.toString())) {
-      return { status: "failed", error: "You already disliked this post" }; 
+      return { status: "failed", error: "You already disliked this post" };
     } else {
-      likeDislike.dislikes.push(userID.toString()); 
+      likeDislike.dislikes.push(userID.toString());
     }
 
-   
     await likeDislike.save();
     await blog.save();
 

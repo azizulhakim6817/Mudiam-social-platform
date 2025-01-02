@@ -13,7 +13,7 @@ export const followUserService = async (req, res) => {
       return { status: "error", error: "Current User not found" };
     }
 
-    // Target User খুঁজে বের করুন
+    // Target User 
     let targetUser = await UserModel.findById(targetUserID);
     if (!targetUser) {
       return { status: "error", error: "Target User not found" };

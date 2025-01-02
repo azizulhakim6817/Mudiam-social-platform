@@ -5,6 +5,7 @@ import {
   createCommentService,
   deleteBlogService,
   deleteCommentService,
+  detailsCommentService,
   dislikeService,
   likeService,
   readCommentService,
@@ -51,6 +52,10 @@ export const updateComment = async (req, res) => {
 
 export const deleteComment = async (req, res) => {
   let result = await deleteCommentService(req);
+  return res.json(result);
+};
+export const detailsComment = async (req, res) => {
+  let result = await detailsCommentService(req);
   return res.json(result);
 };
 

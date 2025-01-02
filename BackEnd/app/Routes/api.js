@@ -5,6 +5,7 @@ import AuthMiddleware from "./../Middleware/AuthenVerity.js";
 import * as UsersController from "../Controller/usersController.js";
 import * as BlogsController from "../Controller/BlogsController.js";
 import * as FollowerController from "../Controller/FollowersController.js";
+import * as ShareBlogController from "../Controller/ShareBlogController.js";
 
 //! Users................
 router.post("/register", UsersController.register);
@@ -34,8 +35,6 @@ router.get(
   AuthMiddleware,
   FollowerController.readFollowers
 );
-/* 
-router.get("/getFollowing/:followerID", AuthMiddleware, UsersController.getFollowing); */
 
 // !Blogs............................
 router.post("/blogCreate", AuthMiddleware, BlogsController.blogcreate);
@@ -61,9 +60,40 @@ router.get(
   AuthMiddleware,
   BlogsController.deleteComment
 );
+router.get(
+  "/detailsComment/:commentID",
+  AuthMiddleware,
+  BlogsController.detailsComment
+);
 
 //! Like & Dislike.....................................
 router.post("/like/:blogID", AuthMiddleware, BlogsController.like);
 router.post("/dislike/:blogID", AuthMiddleware, BlogsController.dislike);
+
+//! Share Blog post..................................
+router.post("/share/:blogID", AuthMiddleware, ShareBlogController.share);
+router.get(
+  "/readSharedPosts/:userID",
+  AuthMiddleware,
+  ShareBlogController.readSharedPosts
+);
+
+router.get(
+  "/detailssharedPost/:sharedPostID",
+  AuthMiddleware,
+  ShareBlogController.detailssharedPost
+);
+
+router.get(
+  "/deleteSharedPost/:sharedPostID",
+  AuthMiddleware,
+  ShareBlogController.deleteSharedPost
+);
+  
+router.get(
+  "/sharedPostUserId/:sharedPostUserID",
+  AuthMiddleware,
+  ShareBlogController.sharedPostUserId
+); 
 
 export default router;
