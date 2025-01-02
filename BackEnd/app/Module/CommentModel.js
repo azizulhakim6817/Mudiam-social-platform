@@ -2,8 +2,16 @@ import mongoose from "mongoose";
 
 const DataSchema = mongoose.Schema(
   {
-    blogID: { type: mongoose.Schema.Types.ObjectId, required: true },
-    userID: { type: mongoose.Schema.Types.ObjectId, required: true },
+    blogID: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "blogs",
+    },
+    userID: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "users",
+    },
     text: { type: String, required: true },
   },
   {

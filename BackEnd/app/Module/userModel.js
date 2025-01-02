@@ -10,8 +10,10 @@ const DataSchema = new mongoose.Schema(
     password: { type: String, required: true },
     email: { type: String, unique: true, required: true, lowercase: true },
     img: { type: String },
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    
+    savedPosts: [{ type: mongoose.Schema.Types.ObjectId, ref: "blogs" }], // Reference to BlogModel
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
   },
   {
     timestamps: true,

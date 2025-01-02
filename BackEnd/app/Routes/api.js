@@ -43,6 +43,18 @@ router.post("/updateBlog/:blogID", AuthMiddleware, BlogsController.updateBlog);
 router.get("/deleteBlog/:blogID", AuthMiddleware, BlogsController.deleteBlog);
 router.get("/blogDetails/:blogID", BlogsController.blogDetails);
 
+//Search Keword Blogs...........
+router.get("/listByKeyword", BlogsController.listByKeyword);
+//Remark Blogs.........................
+router.post("/remarkBlog/:blogID", BlogsController.remarkBlog);
+
+// Blog Tags.................................
+/* router.post("/addTag/:blogID", BlogsController.addTag);
+router.get("/readTags/:blogID", BlogsController.readTags);
+router.get("/deleteTag/:tagID", BlogsController.deleteTag);
+router.get("/detailsTag/:tagID", BlogsController.detailsTag);
+router.get("/listByTag", BlogsController.listByTag); */
+
 // blog comments.........
 router.post(
   "/createComment/:blogID",
@@ -89,11 +101,16 @@ router.get(
   AuthMiddleware,
   ShareBlogController.deleteSharedPost
 );
-  
+
 router.get(
   "/sharedPostUserId/:sharedPostUserID",
   AuthMiddleware,
   ShareBlogController.sharedPostUserId
-); 
+);
+
+//!Save the post..........
+router.post("/savePost/:blogID", AuthMiddleware, BlogsController.savePost);
+router.get("/savedPosts/:userID", AuthMiddleware, BlogsController.savedPosts);
+router.get("/unsave/:savedPostID", AuthMiddleware, BlogsController.unsave); 
 
 export default router;

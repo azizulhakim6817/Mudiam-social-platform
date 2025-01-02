@@ -1,4 +1,5 @@
 import {
+  remarkBlogService,
   blogcreateService,
   blogDetailsService,
   blogReadService,
@@ -8,9 +9,13 @@ import {
   detailsCommentService,
   dislikeService,
   likeService,
+  listByKeywordService,
   readCommentService,
   updateBlogService,
   updateCommentService,
+  saveBlogService,
+  savedPostsService,
+  unsaveService,
 } from "../Service/BlogsService.js";
 
 //! Blog post CRUD operations........................................
@@ -32,6 +37,18 @@ export const deleteBlog = async (req, res) => {
 };
 export const blogDetails = async (req, res) => {
   let result = await blogDetailsService(req);
+  return res.json(result);
+};
+
+// Serch keywords...........
+export const listByKeyword = async (req, res) => {
+  let result = await listByKeywordService(req);
+  return res.json(result);
+};
+
+// Remarks Taps................
+export const remarkBlog = async (req, res) => {
+  let result = await remarkBlogService(req);
   return res.json(result);
 };
 
@@ -66,5 +83,19 @@ export const like = async (req, res) => {
 };
 export const dislike = async (req, res) => {
   let result = await dislikeService(req);
+  return res.json(result);
+};
+
+//! Save Blog post...............................
+export const savePost = async (req, res) => {
+  let result = await saveBlogService(req);
+  return res.json(result);
+};
+export const savedPosts = async (req, res) => {
+  let result = await savedPostsService(req);
+  return res.json(result);
+};
+export const unsave = async (req, res) => {
+  let result = await unsaveService(req);
   return res.json(result);
 };

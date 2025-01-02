@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const { ObjectId } = mongoose.Types;
 import CommentModel from "../Module/CommentModel.js";
 import LikeModel from "../Module/LikeDislikeModel.js";
+import UserModel from "../Module/userModel.js";
 
 //! Blog CRUD operation....................................................
 //create blog..................
@@ -27,7 +28,7 @@ export const blogcreateService = async (req, res) => {
 export const blogReadService = async (req, res) => {
   try {
     const blog = await BlogModel.find({});
-    
+
     return { status: "success", data: blog };
   } catch (e) {
     return { status: "error", error: e.toString() };
@@ -120,6 +121,80 @@ export const blogDetailsService = async (req, res) => {
   }
 };
 
+// Service keyword Blog title and description ..............
+export const listByKeywordService = async (req, res) => {
+  try {
+    let keyword = req.query.keyword;
+    if (!keyword) {
+      return {
+        status: "error",
+        message: "Keyword is required",
+      };
+    }
+
+    // Query blogs by keyword in title or description
+    const blogs = await BlogModel.find({
+      $or: [
+        { title: { $regex: keyword, $options: "i" } },
+        { description: { $regex: keyword, $options: "i" } },
+      ],
+    });
+
+    // If no blogs match the keyword
+    if (blogs.length === 0) {
+      return {
+        status: "error",
+        message: "No blogs found for the given keyword",
+      };
+    }
+    return {
+      status: "success",
+      data: blogs,
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error.toString(),
+    };
+  }
+};
+
+// Remarks Taps blogs ...............
+export const remarkBlogService = async (req, res) => {
+  try {
+    const blogID = new ObjectId(req.params.blogID);
+    const userID = new ObjectId(req.headers.user_id);
+    const { remark } = req.body;
+
+    // Find the blog
+    const blog = await BlogModel.findById(blogID);
+    if (!blog) {
+      return { status: "error", message: "Blog not found" };
+    }
+
+    // Ensure remarks array is initialized
+    if (!Array.isArray(blog.remarks)) {
+      blog.remarks = [];
+    }
+
+    // Add the remark
+    blog.remarks.push({ user: userID, content: remark });
+    await blog.save();
+
+    // Respond with success
+    return {
+      status: "success",
+      message: "Remark added successfully",
+      data: blog,
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error.message,
+    };
+  }
+};
+
 // !Blgo commmetn ..................................
 // create comment......
 export const createCommentService = async (req, res) => {
@@ -144,7 +219,7 @@ export const readCommentService = async (req, res) => {
   try {
     const blogID = new ObjectId(req.params.blogID);
 
-    const comments = await CommentModel.find({ blogID });
+    const comments = await CommentModel.find({ blogID }).populate("blogID");
 
     if (!comments.length) {
       return {
@@ -272,5 +347,89 @@ export const dislikeService = async (req, res) => {
     return { status: "success", data: likeDislike };
   } catch (error) {
     return { status: "error", error: error.message };
+  }
+};
+
+//!Save Blog post.........................
+//save blog post ..............
+export const saveBlogService = async (req, res) => {
+  try {
+    const blogID = new ObjectId(req.params.blogID);
+    const userID = new ObjectId(req.headers.user_id);
+
+    const user = await UserModel.findById(userID);
+    if (!user) {
+      return { status: "error", message: "User not found" };
+    }
+
+    // Initialize savedPosts array if undefined
+    if (!Array.isArray(user.savedPosts)) {
+      user.savedPosts = [];
+    }
+
+    // Check if the blog is already saved
+    if (user.savedPosts.includes(blogID)) {
+      return { status: "error", message: "Blog already saved" };
+    }
+
+    // Save savedPosts array......
+    user.savedPosts.push(blogID);
+    await user.save();
+
+    return {
+      status: "success",
+      message: "Blog post saved successfully",
+      data: user.savedPosts,
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error.toString(),
+    };
+  }
+};
+
+// saved Posts Service
+export const savedPostsService = async (req, res) => {
+  try {
+    const userID = new ObjectId(req.params.userID);
+    const user = await UserModel.findById(userID).populate("savedPosts");
+
+    if (!user) {
+      return { status: "error", message: "User not found" };
+    }
+
+    return {
+      status: "success",
+      message: "Saved posts fetched successfully",
+      data: user.savedPosts,
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error.toString(),
+    };
+  }
+};
+
+// unsave blog post .........................
+export const unsaveService = async (req, res) => {
+  try {
+    const { savedPostID } = req.params;
+    const { user_id } = req.headers;
+
+    const user = await UserModel.findById(user_id);
+    if (!user) return { status: "error", message: "User not found" };
+
+    const index = user.savedPosts.indexOf(savedPostID);
+    if (index === -1)
+      return { status: "error", message: "Blog post not saved" };
+
+    user.savedPosts.splice(index, 1);
+    await user.save();
+
+    return { status: "success", message: "Blog post unsaved successfully" };
+  } catch (error) {
+    return { status: "error", message: error.toString() };
   }
 };
